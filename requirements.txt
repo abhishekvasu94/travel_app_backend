@@ -1,0 +1,13 @@
+flickrapi
+googlemaps
+pandas
+reverse_geocoder
+networkx
+folium
+jupyterlab
+notebook
+tqdm
+gmaps
+matplotlib
+geopy
+-e .
