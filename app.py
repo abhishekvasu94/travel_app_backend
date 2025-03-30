@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Union
+from typing import Union, List
 import pandas as pd
 import json
 
@@ -10,6 +11,21 @@ from travel_app_backend.mst import mst, plot_map
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 with open("./data/distance_between_cities.json", "r") as f:
     data = json.load(f)
     f.close()
@@ -17,10 +33,10 @@ with open("./data/distance_between_cities.json", "r") as f:
 df = pd.read_csv("./data/backpacking_cities_processed.csv")
 
 class citiesList(BaseModel):
-    selected_cities: list[str]
+    selected_cities: List[str]
 
-@app.get("/get_route", response_class=HTMLResponse)
-def get_route(cities: citiesList):
+@app.get("/get_route")
+async def get_route(cities: citiesList = Query(...)):
 
     sub_df = df[df["City"].isin(cities.selected_cities)]
     query_term = list(sub_df["query_term"])
@@ -32,4 +48,6 @@ def get_route(cities: citiesList):
     T = mst(driving_distance)
     map_route = plot_map(T, data)
 
-    return map_route.get_root().render()
+    map_html = map_route.get_root().render()
+
+    return {"map:": map_html}
