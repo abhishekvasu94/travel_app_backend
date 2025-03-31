@@ -16,10 +16,10 @@ def mst(data):
 
     return T
 
-def plot_map(T, data):
+def plot_map(T, data, mean_longitude, mean_latitude):
     locations = []
 
-    m = folium.Map()
+    m = folium.Map(location=(mean_latitude, mean_longitude), zoom_start=5)
     my_edges = list(T.edges)
     
     for pairs in my_edges:

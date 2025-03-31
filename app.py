@@ -47,11 +47,13 @@ async def get_route(cities: citiesList = Query(...)):
 
     subset_data = list(filter(lambda x: (x["city_1"] in query_term) & (x["city_2"] in query_term), data))
 
+    mean_latitude = sub_df['latitude'].mean()
+    mean_longitude = sub_df['longitude'].mean()
 
     driving_distance = get_distance(subset_data)
 
     T = mst(driving_distance)
-    map_route = plot_map(T, subset_data)
+    map_route = plot_map(T, subset_data, mean_longitude, mean_latitude)
 
     map_html = map_route.get_root().render()
 
